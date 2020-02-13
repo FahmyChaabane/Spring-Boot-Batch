@@ -1,10 +1,12 @@
 package com.chaabane.project.batch;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 
 @Entity
 public class AnimeDTO {
 
+    @Id
     private String id;
     private String title;
     private String description;
