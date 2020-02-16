@@ -19,8 +19,7 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 @Configuration
 @EnableBatchProcessing
@@ -37,12 +36,12 @@ public class BatchConfig {
      */
 
     @Bean
-    public Job job(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+    public Job job(JobCompletionNotificationListener listener, JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
                    ItemReader<AnimeDTO> itemReader, ItemProcessor<AnimeDTO, AnimeDTO> itemProcessor,
                    ItemWriter<AnimeDTO> itemWriter) {
 
         Step step = stepBuilderFactory.get("ETL-Batch-Load")
-                .<AnimeDTO, AnimeDTO>chunk(10)
+                .<AnimeDTO, AnimeDTO>chunk(1)
                 .reader(itemReader)
                 .processor(itemProcessor)
                 .writer(itemWriter)
@@ -50,15 +49,16 @@ public class BatchConfig {
 
         return jobBuilderFactory.get("ETL-Load")
                 .incrementer(new RunIdIncrementer())
+                .listener(listener)
                 .start(step)
                 .build();
     }
 
     @Bean
-    public FlatFileItemReader<AnimeDTO> fileItemReader(@Value("${input}") Resource resource) {
+    public FlatFileItemReader<AnimeDTO> fileItemReader(ResourceLoader resourceLoader) {
         FlatFileItemReader<AnimeDTO> flatFileItemReader = new FlatFileItemReader<AnimeDTO>();
-        flatFileItemReader.setResource(resource);
-        //flatFileItemReader.setResource(new ClassPathResource("animescsv.csv"));
+        //flatFileItemReader.setResource(resource);
+        flatFileItemReader.setResource(resourceLoader.getResource("classpath:animecsv.csv"));
         flatFileItemReader.setName("CSV Reader");
         flatFileItemReader.setLinesToSkip(1);
         flatFileItemReader.setLineMapper(lineMapper());
@@ -78,34 +78,5 @@ public class BatchConfig {
         defaultLineMapper.setFieldSetMapper(beanWrapperFieldSetMapper);
         return defaultLineMapper;
     }
-
-
-
-    /*
-    @Bean
-    public FlatFileItemReader< AnimeDTO > csvAnimeReader() {
-        FlatFileItemReader<AnimeDTO> reader = new FlatFileItemReader<AnimeDTO>();
-        reader.setResource(new ClassPathResource("animescsv.csv"));
-        reader.setLineMapper(new DefaultLineMapper<AnimeDTO>() {
-            {
-                setLineTokenizer(new DelimitedLineTokenizer() {
-                    {
-                        setNames(new String[]{
-                                "id",
-                                "title",
-                                "description"
-                        });
-                    }
-                });
-                setFieldSetMapper(new BeanWrapperFieldSetMapper<AnimeDTO>() {
-                    {
-                        setTargetType(AnimeDTO.class);
-                    }
-                });
-            }
-        });
-        return reader;
-    }
-     */
 
 }

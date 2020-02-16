@@ -2,6 +2,7 @@ package com.chaabane.project.batch;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.Date;
 
 @Entity
 public class AnimeDTO {
@@ -10,15 +11,19 @@ public class AnimeDTO {
     private String id;
     private String title;
     private String description;
+    private Date date;
 
     public AnimeDTO(){
     }
-    public AnimeDTO(String id, String title, String description){
+    public AnimeDTO(String id, String title, String description, Date date){
         this.id = id;
         this.title = title;
         this.description = title;
+        this.date = date;
     }
 
+    public Date getDate() { return date; }
+    public void setDate(Date date) { this.date = date; }
     public String getId() {
         return id;
     }
