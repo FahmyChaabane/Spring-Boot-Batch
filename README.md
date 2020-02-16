@@ -1,7 +1,7 @@
 # Spring-Boot-Batch
 a small demo of a spring batch app
 
-run these sql queries to generate the tables required for the batch scheduler
+run these sql queries to generate the tables required for the batch scheduler (if they're not created automatically at runtime)
 
 CREATE TABLE BATCH_JOB_INSTANCE  (
 	JOB_INSTANCE_ID BIGINT  NOT NULL PRIMARY KEY ,
