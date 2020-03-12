@@ -18,7 +18,7 @@ public class AnimeDTO {
     public AnimeDTO(String id, String title, String description, Date date){
         this.id = id;
         this.title = title;
-        this.description = title;
+        this.description = description;
         this.date = date;
     }
 
