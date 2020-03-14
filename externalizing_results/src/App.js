@@ -8,7 +8,8 @@ class App extends Component {
       animeDTOArrayList: [],
       pagesNumber: []
     },
-    currentPage: 0
+    currentPage: 0,
+    search: ""
   };
 
   componentDidMount = async () => {
@@ -22,14 +23,14 @@ class App extends Component {
     }
   };
 
-  method = async index => {
+  paging = async index => {
     try {
       const data = (
         await axios.get("http://localhost:9091/anime?page=" + index)
       ).data;
-      this.setState({ data });
+      this.setState({ data, currentPage: index });
       console.log("index request response", data);
-      console.log("current page", this.state.data.currentPage);
+      console.log("current page", this.state.currentPage);
     } catch (error) {
       console.log("something went wrong with the called server");
     }
@@ -41,11 +42,10 @@ class App extends Component {
     else {
       try {
         const data = (
-          await axios.get("http://localhost:9091/anime?page=" + index - 1)
+          await axios.get("http://localhost:9091/anime?page=" + (index - 1))
         ).data;
-        this.setState({ data });
-        console.log("current page", this.state.data.currentPage);
-        console.log("index request response", data);
+        this.setState({ data, currentPage: index - 1 });
+        console.log("current page", this.state.currentPage);
       } catch (error) {
         console.log("something went wrong with the called server");
       }
@@ -55,18 +55,22 @@ class App extends Component {
   next = async index => {
     console.log("next");
     if (index === this.state.data.pagesNumber.length - 1) return;
-    else {
-      try {
-        const data = (
-          await axios.get("http://localhost:9091/anime?page=" + index + 1)
-        ).data;
-        this.setState({ data });
-        this.setState({ data, currentPage: index });
-        console.log("current page", this.state.data.currentPage);
-      } catch (error) {
-        console.log("something went wrong with the called server");
-      }
+    try {
+      const data = (
+        await axios.get("http://localhost:9091/anime?page=" + (index + 1))
+      ).data;
+      this.setState({ data, currentPage: index + 1 });
+      console.log("current page", this.state.currentPage);
+    } catch (error) {
+      console.log("something went wrong with the called server");
     }
+  };
+
+  handleChange = ({ currentTarget: input }) => {
+    //const search = { ...this.state.search };
+    //this.state[input.name] = input.value;
+    this.setState({ search: input.value });
+    console.log(this.state.search);
   };
 
   render() {
@@ -74,10 +78,20 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <p>
-            Spring <code>Boot</code> pagination and http requests.
+            Spring <code>Boot</code> pagination and HTTP Requests.{" "}
           </p>
         </header>
-
+        <hr />
+        <nav className="navbar navbar-dark bg-dark">
+          <input
+            className="form-control mr-sm-2"
+            type="text"
+            onChange={this.handleChange}
+            placeholder="Search"
+            name="search"
+          />
+        </nav>
+        <br />
         <table className="table">
           <thead>
             <tr>
@@ -111,17 +125,8 @@ class App extends Component {
                 Previous
               </button>
             </li>
-            {this.state.data.pagesNumber.length === 0 ? (
-              <button className="page-link"></button>
-            ) : (
-              this.state.data.pagesNumber.map((e, i) => (
-                <li className="page-item" key={i}>
-                  <button className="page-link" onClick={() => this.method(i)}>
-                    {i + 1}
-                  </button>
-                </li>
-              ))
-            )}
+
+            {this.showPages(this.state.data.pagesNumber)}
 
             <li className="page-item">
               <button
@@ -133,10 +138,25 @@ class App extends Component {
             </li>
           </ul>
         </nav>
+
         <hr />
       </div>
     );
   }
+
+  showPages = array => {
+    return array.length === 0 ? (
+      <button className="page-link"></button>
+    ) : (
+      this.state.data.pagesNumber.map((e, i) => (
+        <li className="page-item" key={i}>
+          <button className="page-link" onClick={() => this.paging(i)}>
+            {i + 1}
+          </button>
+        </li>
+      ))
+    );
+  };
 }
 
 export default App;

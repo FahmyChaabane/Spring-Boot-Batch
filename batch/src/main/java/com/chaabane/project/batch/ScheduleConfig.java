@@ -23,7 +23,7 @@ public class ScheduleConfig {
     @Autowired
     private Job job;
 
-    @Scheduled(cron = "0 14 14 * * ?")
+    @Scheduled(cron = "0 51 00 * * ?")
     public void scheduleFixedDelayTask() throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {
 
         Map<String, JobParameter> maps = new HashMap<>();

@@ -1,7 +1,12 @@
 package com.chaabane.project.batch;
 
+import org.hibernate.annotations.Type;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.validation.constraints.Min;
 import java.util.Date;
 
 @Entity
@@ -10,6 +15,7 @@ public class AnimeDTO {
     @Id
     private String id;
     private String title;
+    @Column(columnDefinition = "text")
     private String description;
     private Date date;
 

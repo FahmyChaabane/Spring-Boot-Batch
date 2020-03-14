@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-
 
 @RestController
 @RequestMapping("/")
@@ -20,10 +18,12 @@ public class AnimeRestController {
     @CrossOrigin("http://localhost:3000")
     @GetMapping("/anime")
     public ResponseEntity<AnimeResponse> load(@RequestParam(name="page", defaultValue = "0") int p,
-                                     @RequestParam(name="size", defaultValue = "50") int s){
+                                     @RequestParam(name="size", defaultValue = "50") int s,
+                                              @RequestParam(name="criterion", defaultValue ="") String criterion){
         AnimeResponse animeResponse = new AnimeResponse();
         try {
-            Page<AnimeDTO> animePageable= animeRepo.findAll(PageRequest.of(p, s, Sort.by("id")));
+            //Page<AnimeDTO> animePageable= animeRepo.findAll(PageRequest.of(p, s, Sort.by("id")));
+            Page<AnimeDTO> animePageable= animeRepo.animeDTOByTitles("%"+criterion+"%", PageRequest.of(p,s,Sort.by("id")));
             animeResponse.setAnimeDTOArrayList(animePageable.getContent());
             animeResponse.setPagesNumber(new int[animePageable.getTotalPages()]);
         } catch(Exception e) {
