@@ -26,7 +26,12 @@ class App extends Component {
   paging = async index => {
     try {
       const data = (
-        await axios.get("http://localhost:9091/anime?page=" + index)
+        await axios.get(
+          "http://localhost:9091/anime?page=" +
+            index +
+            "&criterion=" +
+            this.state.search
+        )
       ).data;
       this.setState({ data, currentPage: index });
       console.log("index request response", data);
@@ -42,7 +47,12 @@ class App extends Component {
     else {
       try {
         const data = (
-          await axios.get("http://localhost:9091/anime?page=" + (index - 1))
+          await axios.get(
+            "http://localhost:9091/anime?page=" +
+              (index - 1) +
+              "&criterion=" +
+              this.state.search
+          )
         ).data;
         this.setState({ data, currentPage: index - 1 });
         console.log("current page", this.state.currentPage);
@@ -57,7 +67,12 @@ class App extends Component {
     if (index === this.state.data.pagesNumber.length - 1) return;
     try {
       const data = (
-        await axios.get("http://localhost:9091/anime?page=" + (index + 1))
+        await axios.get(
+          "http://localhost:9091/anime?page=" +
+            (index + 1) +
+            "&criterion=" +
+            this.state.search
+        )
       ).data;
       this.setState({ data, currentPage: index + 1 });
       console.log("current page", this.state.currentPage);
@@ -67,10 +82,20 @@ class App extends Component {
   };
 
   handleChange = ({ currentTarget: input }) => {
-    //const search = { ...this.state.search };
-    //this.state[input.name] = input.value;
-    this.setState({ search: input.value });
-    console.log(this.state.search);
+    console.log("search");
+    this.setState({ search: input.value }, async () => {
+      try {
+        const data = (
+          await axios.get(
+            "http://localhost:9091/anime?criterion=" + this.state.search
+          )
+        ).data;
+        this.setState({ data });
+        console.log("current page", this.state.currentPage);
+      } catch (error) {
+        console.log("something went wrong with the called server");
+      }
+    });
   };
 
   render() {
@@ -102,7 +127,9 @@ class App extends Component {
           </thead>
           <tbody>
             {this.state.data.animeDTOArrayList.length === 0 ? (
-              <code>data is loading... </code>
+              <tr>
+                <td>no result found...</td>
+              </tr>
             ) : (
               this.state.data.animeDTOArrayList.map(el => (
                 <tr key={el.id}>
